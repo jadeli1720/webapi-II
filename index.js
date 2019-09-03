@@ -74,15 +74,14 @@ server.post('/api/posts', (req, res) => {
 });
 
 //post request to: /api/posts/:id/comments
-//req.body.post_id;
 server.post('/api/posts/:id/comments', (req, res) => {
-    const commentsId = req.body.post_id;
+    // const commentsId = req.body.post_id;
     const { text } = req.body;
 
     if (!text) {
         res.status(400).json({ errorMessage: "Please provide text for the comment." })
     } else {
-        Posts.insertComment(commentsId)
+        Posts.insertComment(req.body)
             .then(id => {
                 if (id) {
                     res.status(201).json(id)
@@ -98,8 +97,16 @@ server.post('/api/posts/:id/comments', (req, res) => {
     }
 });
 
+//DELETE request /api/posts/:id
+server.delete('/api/posts/:id', (req, res) => {
+    const postsId = req.params.id;
 
-//get posts
+    Posts.remove(postsId)
+        .then()
+        .catch(err => {
+            res.status(500).json({ error: "The post information could not be modified." })
+        })
+})
 
 
 
