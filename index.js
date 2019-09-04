@@ -1,9 +1,13 @@
 const express = require('express');
 const Posts = require('./data/db');
+const cors = require('cors');
 
 const server = express('');
 
 server.use(express.json());
+
+//middleware
+server.use(cors());
 
 server.get('/', (req, res) => {
     res.send('Hello World')
@@ -31,7 +35,7 @@ server.get('/api/posts/:id', (req, res) => {
             if (id) {
                 res.status(200).json(id)
             } else {
-                res.status(404)({ message: "The post with the specified ID does not exist." })
+                res.status(404).json({ message: "The post with the specified ID does not exist." })
             }
         })
         .catch(() => {
@@ -44,15 +48,19 @@ server.get('/api/posts/:id', (req, res) => {
 //Get request /api/posts/:id/comments
 server.get('/api/posts/:id/comments', (req, res) => {
     const commentsId = req.params.id;
-
-    Posts.findPostComments(commentsId)
-        .then(comment => {
-            if (comment) {
-                res.status(200).json(comment)
-            } else {
-                res.status(404)({ message: "The comment with the specified ID does not exist." })
-            }
-        })
+    if (!commentsId) {
+        res.status(404).json({ message: "The comment with the specified ID does not exist." })
+    } else {
+        Posts.findPostComments(commentsId)
+            .then(comments => {
+                res.status(200).json(comments)
+            })
+            .catch(() => {
+                res.status(500).json({
+                    error: "The comment information could not be retrieved."
+                });
+            });
+    }
 })
 
 //post request to: /api/posts
@@ -119,7 +127,7 @@ server.delete('/api/posts/:id', (req, res) => {
 server.put('/api/posts/:id', (req, res) => {
     const { title, contents } = req.body;
 
-    if(!title || !contents) {
+    if (!title || !contents) {
         res.status(400).json({ errorMessage: "Please provide title and contents for the post." })
     } else {
         const postsId = req.params.id;
@@ -127,7 +135,7 @@ server.put('/api/posts/:id', (req, res) => {
             .then(post => {
                 if (post) {
                     res.status(200).json(post);
-                }else {
+                } else {
                     res.status(404).json({ message: "The post with the specified ID does not exist." })
                 }
             })
