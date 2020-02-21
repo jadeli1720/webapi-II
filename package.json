@@ -7,8 +7,9 @@
   "scripts": {
     "server": "nodemon index.js"
   },
-  "dependencies": {
     "knex": "^0.19.5",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
     "sqlite3": "^4.0.9"
   },
   "devDependencies": {
